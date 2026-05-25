@@ -1,0 +1,472 @@
+<!DOCTYPE html>
+<html lang="id">
+<head>
+  <meta charset="UTF-8">
+  <meta name="viewport" content="width=device-width, initial-scale=1.0">
+
+  <title>Stok Bahan Ajar</title>
+
+  <script src="https://cdn.jsdelivr.net/npm/vue@2"></script>
+
+  <style>
+
+    body{
+      margin:0;
+      font-family:Arial;
+      background:linear-gradient(135deg,#0f4c81,#7b2ff7);
+      min-height:100vh;
+      color:white;
+      padding:30px;
+    }
+
+    h1{
+      font-size:60px;
+      margin-bottom:30px;
+    }
+
+    .filter{
+      display:flex;
+      gap:15px;
+      margin-bottom:30px;
+      flex-wrap:wrap;
+      align-items:center;
+    }
+
+    select,input,button{
+      padding:15px;
+      border:none;
+      border-radius:14px;
+      font-size:18px;
+    }
+
+    button{
+      background:#8a3ffc;
+      color:white;
+      cursor:pointer;
+    }
+
+    table{
+      width:100%;
+      border-collapse:collapse;
+      background:rgba(0,0,0,0.2);
+      margin-bottom:40px;
+    }
+
+    th{
+      background:#2563eb;
+      padding:18px;
+      font-size:18px;
+    }
+
+    td{
+      padding:18px;
+      border:1px solid rgba(255,255,255,0.15);
+      font-size:17px;
+    }
+
+    .aman{
+      color:#4ade80;
+      font-weight:bold;
+    }
+
+    .menipis{
+      color:orange;
+      font-weight:bold;
+    }
+
+    .kosong{
+      color:red;
+      font-weight:bold;
+    }
+
+    .form{
+      display:grid;
+      grid-template-columns:repeat(5,1fr);
+      gap:15px;
+    }
+
+    h2{
+      font-size:50px;
+      margin-bottom:20px;
+    }
+
+  </style>
+
+</head>
+
+<body>
+
+<div id="app">
+
+  <h1>📦 Stok Bahan Ajar</h1>
+
+  <div class="filter">
+
+    <select v-model="filterUpbjj">
+
+      <option value="">
+        Semua UPBJJ
+      </option>
+
+      <option
+        v-for="item in upbjjList"
+        :value="item"
+      >
+        {{ item }}
+      </option>
+
+    </select>
+
+    <select v-model="filterKategori">
+
+      <option value="">
+        Semua Kategori
+      </option>
+
+      <option
+        v-for="item in kategoriList"
+        :value="item"
+      >
+        {{ item }}
+      </option>
+
+    </select>
+
+    <label>
+
+      <input
+        type="checkbox"
+        v-model="showMenipis"
+      >
+
+      Stok Menipis
+
+    </label>
+
+    <label>
+
+      <input
+        type="checkbox"
+        v-model="showKosong"
+      >
+
+      Stok Kosong
+
+    </label>
+
+    <button @click="resetFilter">
+      Reset
+    </button>
+
+  </div>
+
+  <table>
+
+    <thead>
+
+      <tr>
+        <th>Kode</th>
+        <th>Judul</th>
+        <th>Kategori</th>
+        <th>UPBJJ</th>
+        <th>Qty</th>
+        <th>Safety</th>
+        <th>Status</th>
+        <th>Catatan</th>
+      </tr>
+
+    </thead>
+
+    <tbody>
+
+      <tr v-for="item in filteredStok">
+
+        <td>{{ item.kode }}</td>
+
+        <td>{{ item.judul }}</td>
+
+        <td>{{ item.kategori }}</td>
+
+        <td>{{ item.upbjj }}</td>
+
+        <td>{{ item.qty }}</td>
+
+        <td>{{ item.safety }}</td>
+
+        <td>
+
+          <span
+            v-if="item.qty == 0"
+            class="kosong"
+          >
+            ❌ Kosong
+          </span>
+
+          <span
+            v-else-if="item.qty < item.safety"
+            class="menipis"
+          >
+            ⚠ Menipis
+          </span>
+
+          <span
+            v-else
+            class="aman"
+          >
+            ✅ Aman
+          </span>
+
+        </td>
+
+        <td v-html="item.catatanHTML"></td>
+
+      </tr>
+
+    </tbody>
+
+  </table>
+
+  <h2>Tambah Data</h2>
+
+  <div class="form">
+
+    <input
+      type="text"
+      placeholder="Kode"
+      v-model="form.kode"
+    >
+
+    <input
+      type="text"
+      placeholder="Judul"
+      v-model="form.judul"
+    >
+
+    <select v-model="form.kategori">
+
+      <option value="">
+        Pilih Kategori
+      </option>
+
+      <option
+        v-for="item in kategoriList"
+        :value="item"
+      >
+        {{ item }}
+      </option>
+
+    </select>
+
+    <select v-model="form.upbjj">
+
+      <option value="">
+        Pilih UPBJJ
+      </option>
+
+      <option
+        v-for="item in upbjjList"
+        :value="item"
+      >
+        {{ item }}
+      </option>
+
+    </select>
+
+    <input
+      type="number"
+      placeholder="Qty"
+      v-model="form.qty"
+    >
+
+    <input
+      type="number"
+      placeholder="Safety"
+      v-model="form.safety"
+    >
+
+    <input
+      type="text"
+      placeholder="Catatan"
+      v-model="form.catatanHTML"
+    >
+
+    <button @click="tambahData">
+      Simpan
+    </button>
+
+  </div>
+
+</div>
+
+<script>
+
+new Vue({
+
+  el:'#app',
+
+  data:{
+
+    upbjjList:[
+      "Jakarta",
+      "Surabaya",
+      "Makassar",
+      "Padang",
+      "Denpasar"
+    ],
+
+    kategoriList:[
+      "MK Wajib",
+      "MK Pilihan",
+      "Praktikum",
+      "Problem-Based"
+    ],
+
+    stok:[
+
+      {
+        kode:"EKMA4116",
+        judul:"Pengantar Manajemen",
+        kategori:"MK Wajib",
+        upbjj:"Jakarta",
+        qty:28,
+        safety:20,
+        catatanHTML:"<i>Edisi 2024</i>"
+      },
+
+      {
+        kode:"EKMA4115",
+        judul:"Pengantar Akuntansi",
+        kategori:"MK Wajib",
+        upbjj:"Jakarta",
+        qty:7,
+        safety:15,
+        catatanHTML:"<b>Cover baru</b>"
+      },
+
+      {
+        kode:"BIOL4201",
+        judul:"Biologi Umum",
+        kategori:"Praktikum",
+        upbjj:"Surabaya",
+        qty:12,
+        safety:10,
+        catatanHTML:"Buku Praktikum"
+      },
+
+      {
+        kode:"MSIM4201",
+        judul:"Cara Timpah Teks",
+        kategori:"MK Wajib",
+        upbjj:"Makassar",
+        qty:0,
+        safety:10,
+        catatanHTML:"<b>Stok habis</b>"
+      }
+
+    ],
+
+    filterUpbjj:'',
+    filterKategori:'',
+    showMenipis:false,
+    showKosong:false,
+
+    form:{
+      kode:'',
+      judul:'',
+      kategori:'',
+      upbjj:'',
+      qty:'',
+      safety:'',
+      catatanHTML:''
+    }
+
+  },
+
+  computed:{
+
+    filteredStok(){
+
+      let data = this.stok;
+
+      if(this.filterUpbjj){
+
+        data = data.filter(item =>
+          item.upbjj == this.filterUpbjj
+        );
+
+      }
+
+      if(this.filterKategori){
+
+        data = data.filter(item =>
+          item.kategori == this.filterKategori
+        );
+
+      }
+
+      if(this.showMenipis){
+
+        data = data.filter(item =>
+          item.qty < item.safety &&
+          item.qty > 0
+        );
+
+      }
+
+      if(this.showKosong){
+
+        data = data.filter(item =>
+          item.qty == 0
+        );
+
+      }
+
+      return data;
+
+    }
+
+  },
+
+  methods:{
+
+    resetFilter(){
+
+      this.filterUpbjj = '';
+      this.filterKategori = '';
+      this.showMenipis = false;
+      this.showKosong = false;
+
+    },
+
+    tambahData(){
+
+      this.stok.push({
+
+        kode:this.form.kode,
+        judul:this.form.judul,
+        kategori:this.form.kategori,
+        upbjj:this.form.upbjj,
+        qty:this.form.qty,
+        safety:this.form.safety,
+        catatanHTML:this.form.catatanHTML
+
+      });
+
+      this.form.kode='';
+      this.form.judul='';
+      this.form.kategori='';
+      this.form.upbjj='';
+      this.form.qty='';
+      this.form.safety='';
+      this.form.catatanHTML='';
+
+    }
+
+  }
+
+});
+
+</script>
+
+</body>
+</html>

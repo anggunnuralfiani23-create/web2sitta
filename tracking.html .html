@@ -1,0 +1,306 @@
+<!DOCTYPE html>
+<html lang="id">
+<head>
+  <meta charset="UTF-8">
+  <meta name="viewport" content="width=device-width, initial-scale=1.0">
+
+  <title>Tracking Delivery Order</title>
+
+  <script src="https://cdn.jsdelivr.net/npm/vue@2"></script>
+
+  <style>
+
+    body{
+      margin:0;
+      font-family: Arial;
+      background: linear-gradient(135deg,#0f4c81,#7b2ff7);
+      min-height:100vh;
+      color:white;
+      padding:30px;
+    }
+
+    h1{
+      font-size:50px;
+      margin-bottom:30px;
+    }
+
+    .form{
+      display:grid;
+      grid-template-columns: repeat(2,1fr);
+      gap:15px;
+      margin-bottom:30px;
+    }
+
+    input,select,button{
+      padding:15px;
+      border:none;
+      border-radius:12px;
+      font-size:18px;
+    }
+
+    button{
+      background:#8a3ffc;
+      color:white;
+      cursor:pointer;
+    }
+
+    table{
+      width:100%;
+      border-collapse:collapse;
+      background:rgba(0,0,0,0.2);
+    }
+
+    th{
+      background:#2563eb;
+      padding:15px;
+      font-size:18px;
+    }
+
+    td{
+      padding:15px;
+      text-align:center;
+      border:1px solid rgba(255,255,255,0.2);
+      font-size:16px;
+    }
+
+    .hapus{
+      background:red;
+      color:white;
+    }
+
+    .edit{
+      background:orange;
+      color:white;
+      margin-right:5px;
+    }
+
+  </style>
+
+</head>
+
+<body>
+
+<div id="trackingApp">
+
+  <h1>🚚 Tracking Delivery Order</h1>
+
+  <div class="form">
+
+    <input
+      type="text"
+      placeholder="NIM"
+      v-model="form.nim"
+    >
+
+    <input
+      type="text"
+      placeholder="Nama"
+      v-model="form.nama"
+    >
+
+    <select v-model="form.ekspedisi">
+
+      <option value="">Pilih Ekspedisi</option>
+
+      <option
+        v-for="item in pengirimanList"
+        :value="item.nama"
+      >
+        {{ item.nama }}
+      </option>
+
+    </select>
+
+    <select v-model="form.paket">
+
+      <option value="">Pilih Paket</option>
+
+      <option
+        v-for="item in paket"
+        :value="item.nama"
+      >
+        {{ item.nama }}
+      </option>
+
+    </select>
+
+    <button @click="simpanDO">
+      Simpan DO
+    </button>
+
+  </div>
+
+  <table>
+
+    <thead>
+
+      <tr>
+        <th>No DO</th>
+        <th>NIM</th>
+        <th>Nama</th>
+        <th>Ekspedisi</th>
+        <th>Paket</th>
+        <th>Total</th>
+        <th>Status</th>
+        <th>Aksi</th>
+      </tr>
+
+    </thead>
+
+    <tbody>
+
+      <tr v-for="(item, nomor) in tracking">
+
+        <td>{{ nomor }}</td>
+        <td>{{ item.nim }}</td>
+        <td>{{ item.nama }}</td>
+        <td>{{ item.ekspedisi }}</td>
+        <td>{{ item.paket }}</td>
+        <td>Rp {{ item.total }}</td>
+        <td>{{ item.status }}</td>
+
+        <td>
+
+          <button
+            class="edit"
+            @click="editDO(nomor)"
+          >
+            Edit
+          </button>
+
+          <button
+            class="hapus"
+            @click="hapusDO(nomor)"
+          >
+            Hapus
+          </button>
+
+        </td>
+
+      </tr>
+
+    </tbody>
+
+  </table>
+
+</div>
+
+<script>
+
+new Vue({
+
+  el:'#trackingApp',
+
+  data:{
+
+    pengirimanList:[
+      { kode:'REG', nama:'Reguler (3-5 hari)' },
+      { kode:'EXP', nama:'Ekspres (1-2 hari)' }
+    ],
+
+    paket:[
+      {
+        kode:'PAKET-UT-001',
+        nama:'PAKET IPS Dasar',
+        harga:120000
+      },
+
+      {
+        kode:'PAKET-UT-002',
+        nama:'PAKET IPA Dasar',
+        harga:140000
+      }
+    ],
+
+    tracking:{
+
+      "DO2025-0001":{
+
+        nim:'123456789',
+        nama:'Rina Wulandari',
+        ekspedisi:'JNE',
+        paket:'PAKET IPS Dasar',
+        total:120000,
+        status:'Dalam Perjalanan'
+
+      }
+
+    },
+
+    form:{
+      nim:'',
+      nama:'',
+      ekspedisi:'',
+      paket:''
+    },
+
+    editNomor:null
+
+  },
+
+  methods:{
+
+    simpanDO(){
+
+      if(this.editNomor){
+
+        this.tracking[this.editNomor].nim = this.form.nim;
+        this.tracking[this.editNomor].nama = this.form.nama;
+        this.tracking[this.editNomor].ekspedisi = this.form.ekspedisi;
+        this.tracking[this.editNomor].paket = this.form.paket;
+
+        this.editNomor = null;
+
+      }else{
+
+        let nomor =
+        'DO2025-' +
+        String(
+          Object.keys(this.tracking).length + 1
+        ).padStart(4,'0');
+
+        this.tracking[nomor]={
+
+          nim:this.form.nim,
+          nama:this.form.nama,
+          ekspedisi:this.form.ekspedisi,
+          paket:this.form.paket,
+          total:120000,
+          status:'Diproses'
+
+        };
+
+      }
+
+      this.form.nim='';
+      this.form.nama='';
+      this.form.ekspedisi='';
+      this.form.paket='';
+
+    },
+
+    editDO(nomor){
+
+      this.form.nim = this.tracking[nomor].nim;
+      this.form.nama = this.tracking[nomor].nama;
+      this.form.ekspedisi = this.tracking[nomor].ekspedisi;
+      this.form.paket = this.tracking[nomor].paket;
+
+      this.editNomor = nomor;
+
+    },
+
+    hapusDO(nomor){
+
+      delete this.tracking[nomor];
+
+    }
+
+  }
+
+});
+
+</script>
+
+</body>
+</html>

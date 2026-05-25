@@ -1,0 +1,512 @@
+<!DOCTYPE html>
+<html lang="id">
+<head>
+  <meta charset="UTF-8">
+  <meta name="viewport" content="width=device-width, initial-scale=1.0">
+  <title>SITTA-UT | Tracking Pengiriman</title>
+  <link href="https://fonts.googleapis.com/css2?family=Syne:wght@400;600;700;800&family=DM+Sans:wght@300;400;500&display=swap" rel="stylesheet">
+  <style>
+    *, *::before, *::after { box-sizing: border-box; margin: 0; padding: 0; }
+    :root {
+      --orange: #f97316;
+      --navy: #1e3a8a;
+      --bg: #0f172a;
+      --card: #1e293b;
+      --border: rgba(255,255,255,0.08);
+      --text: #f1f5f9;
+      --muted: #94a3b8;
+      --green: #22c55e;
+      --yellow: #eab308;
+      --red: #ef4444;
+    }
+    body {
+      font-family: 'DM Sans', sans-serif;
+      background: var(--bg);
+      color: var(--text);
+      min-height: 100vh;
+    }
+
+    /* SIDEBAR */
+    .sidebar {
+      width: 240px;
+      background: var(--card);
+      border-right: 1px solid var(--border);
+      display: flex;
+      flex-direction: column;
+      padding: 28px 0;
+      position: fixed;
+      top: 0;
+      left: 0;
+      bottom: 0;
+      z-index: 20;
+    }
+    .sidebar-brand {
+      display: flex;
+      align-items: center;
+      gap: 10px;
+      padding: 0 24px;
+      margin-bottom: 36px;
+    }
+    .brand-icon {
+      width: 38px;
+      height: 38px;
+      background: var(--orange);
+      border-radius: 10px;
+      display: flex;
+      align-items: center;
+      justify-content: center;
+      font-size: 18px;
+    }
+    .brand-name {
+      font-family: 'Syne', sans-serif;
+      font-weight: 800;
+      font-size: 18px;
+      color: white;
+    }
+    .nav-section {
+      padding: 0 16px;
+      margin-bottom: 4px;
+    }
+    .nav-label {
+      font-size: 10px;
+      text-transform: uppercase;
+      letter-spacing: 1px;
+      color: var(--muted);
+      padding: 0 8px;
+      margin-bottom: 6px;
+    }
+    .nav-item {
+      display: flex;
+      align-items: center;
+      gap: 10px;
+      padding: 10px 12px;
+      border-radius: 10px;
+      color: var(--muted);
+      text-decoration: none;
+      font-size: 14px;
+      font-weight: 500;
+      transition: all 0.2s;
+      margin-bottom: 2px;
+      cursor: pointer;
+    }
+    .nav-item:hover { background: rgba(255,255,255,0.05); color: var(--text); }
+    .nav-item.active { background: rgba(249,115,22,0.15); color: var(--orange); }
+    .nav-item .icon { font-size: 17px; }
+    .sidebar-bottom {
+      margin-top: auto;
+      padding: 0 16px;
+    }
+    .user-card {
+      display: flex;
+      align-items: center;
+      gap: 10px;
+      padding: 12px;
+      background: rgba(255,255,255,0.04);
+      border-radius: 10px;
+    }
+    .user-avatar {
+      width: 36px;
+      height: 36px;
+      background: var(--orange);
+      border-radius: 50%;
+      display: flex;
+      align-items: center;
+      justify-content: center;
+      font-weight: 700;
+      font-size: 14px;
+      color: white;
+    }
+    .user-info { flex: 1; }
+    .user-name { font-size: 13px; font-weight: 600; color: var(--text); }
+    .user-role { font-size: 11px; color: var(--muted); }
+    .logout-btn {
+      background: none;
+      border: none;
+      color: var(--muted);
+      cursor: pointer;
+      font-size: 16px;
+      transition: color 0.2s;
+    }
+    .logout-btn:hover { color: var(--red); }
+
+    .main {
+      margin-left: 240px;
+      min-height: 100vh;
+      padding: 32px 36px;
+      animation: fadeUp 0.4s ease;
+    }
+
+    .page-header {
+      margin-bottom: 24px;
+    }
+    .page-header h1 {
+      font-family: 'Syne', sans-serif;
+      font-size: 34px;
+      font-weight: 800;
+      color: var(--text);
+      margin-bottom: 6px;
+    }
+    .page-header span { color: var(--orange); }
+    .page-header p { color: var(--muted); font-size: 15px; }
+
+    /* HERO */
+    .hero {
+      text-align: center;
+      padding: 60px 20px 40px;
+    }
+    .hero h1 {
+      font-family: 'Syne', sans-serif;
+      font-size: 38px;
+      font-weight: 800;
+      color: var(--text);
+      margin-bottom: 10px;
+    }
+    .hero h1 span { color: var(--orange); }
+    .hero p { color: var(--muted); font-size: 16px; }
+
+    /* SEARCH */
+    .search-box {
+      max-width: 560px;
+      margin: 36px auto 0;
+      display: flex;
+      gap: 10px;
+    }
+    .search-box input {
+      flex: 1;
+      padding: 14px 20px;
+      background: var(--card);
+      border: 1.5px solid var(--border);
+      border-radius: 12px;
+      color: var(--text);
+      font-size: 15px;
+      font-family: 'DM Sans', sans-serif;
+      outline: none;
+      transition: border-color 0.2s;
+    }
+    .search-box input:focus { border-color: var(--orange); }
+    .search-box input::placeholder { color: rgba(148,163,184,0.4); }
+    .btn-cari {
+      padding: 14px 26px;
+      background: var(--orange);
+      color: white;
+      border: none;
+      border-radius: 12px;
+      font-size: 15px;
+      font-weight: 600;
+      font-family: 'Syne', sans-serif;
+      cursor: pointer;
+      transition: background 0.2s;
+      white-space: nowrap;
+    }
+    .btn-cari:hover { background: #ea6a0a; }
+
+    /* RESULT */
+    .result-container {
+      max-width: 700px;
+      margin: 40px auto;
+      padding: 0 20px;
+      animation: fadeUp 0.4s ease;
+    }
+    @keyframes fadeUp {
+      from { opacity:0; transform:translateY(16px); }
+      to   { opacity:1; transform:translateY(0); }
+    }
+
+    .result-card {
+      background: var(--card);
+      border: 1px solid var(--border);
+      border-radius: 18px;
+      overflow: hidden;
+    }
+    .result-header {
+      padding: 24px 28px;
+      background: linear-gradient(135deg, rgba(249,115,22,0.1) 0%, transparent 60%);
+      border-bottom: 1px solid var(--border);
+      display: flex;
+      align-items: center;
+      justify-content: space-between;
+      flex-wrap: wrap;
+      gap: 12px;
+    }
+    .do-label { font-size: 12px; color: var(--muted); text-transform: uppercase; letter-spacing: 0.5px; }
+    .do-number {
+      font-family: 'Syne', sans-serif;
+      font-size: 22px;
+      font-weight: 800;
+      color: var(--orange);
+    }
+    .status-badge {
+      padding: 6px 16px;
+      border-radius: 20px;
+      font-size: 13px;
+      font-weight: 600;
+    }
+    .badge-terkirim { background: rgba(34,197,94,0.15); color: var(--green); }
+    .badge-dikirim  { background: rgba(234,179,8,0.15); color: var(--yellow); }
+    .badge-diproses { background: rgba(249,115,22,0.15); color: var(--orange); }
+    .badge-ditahan  { background: rgba(239,68,68,0.15); color: var(--red); }
+
+    .result-info {
+      display: grid;
+      grid-template-columns: 1fr 1fr;
+      gap: 0;
+    }
+    .info-item {
+      padding: 16px 28px;
+      border-right: 1px solid var(--border);
+      border-bottom: 1px solid var(--border);
+    }
+    .info-item:nth-child(even) { border-right: none; }
+    .info-label { font-size: 11px; color: var(--muted); text-transform: uppercase; letter-spacing: 0.5px; margin-bottom: 4px; }
+    .info-value { font-size: 15px; font-weight: 500; color: var(--text); }
+
+    /* TIMELINE */
+    .timeline-section {
+      padding: 24px 28px;
+    }
+    .timeline-title {
+      font-family: 'Syne', sans-serif;
+      font-size: 14px;
+      font-weight: 700;
+      color: var(--muted);
+      text-transform: uppercase;
+      letter-spacing: 0.5px;
+      margin-bottom: 20px;
+    }
+    .timeline {
+      position: relative;
+      padding-left: 24px;
+    }
+    .timeline::before {
+      content: '';
+      position: absolute;
+      left: 6px; top: 0; bottom: 0;
+      width: 2px;
+      background: var(--border);
+    }
+    .tl-item {
+      position: relative;
+      margin-bottom: 20px;
+    }
+    .tl-item:last-child { margin-bottom: 0; }
+    .tl-dot {
+      position: absolute;
+      left: -21px; top: 4px;
+      width: 14px; height: 14px;
+      border-radius: 50%;
+      border: 2px solid var(--bg);
+    }
+    .tl-dot.done { background: var(--green); }
+    .tl-dot.current { background: var(--orange); box-shadow: 0 0 0 3px rgba(249,115,22,0.25); }
+    .tl-dot.pending { background: var(--border); border: 2px solid rgba(148,163,184,0.3); }
+    .tl-time { font-size: 11px; color: var(--muted); margin-bottom: 2px; }
+    .tl-desc { font-size: 14px; color: var(--text); font-weight: 500; }
+    .tl-loc { font-size: 12px; color: var(--muted); }
+
+    /* NOT FOUND */
+    .not-found {
+      text-align: center;
+      padding: 60px 20px;
+    }
+    .not-found .icon { font-size: 56px; margin-bottom: 16px; }
+    .not-found h3 {
+      font-family: 'Syne', sans-serif;
+      font-size: 20px;
+      font-weight: 700;
+      color: var(--text);
+      margin-bottom: 8px;
+    }
+    .not-found p { color: var(--muted); font-size: 14px; }
+
+    /* HINT */
+    .hint-section {
+      max-width: 700px;
+      margin: 0 auto;
+      padding: 0 20px 60px;
+    }
+    .hint-title {
+      font-size: 13px;
+      color: var(--muted);
+      text-align: center;
+      margin-bottom: 12px;
+    }
+    .hint-list {
+      display: flex;
+      flex-wrap: wrap;
+      gap: 8px;
+      justify-content: center;
+    }
+    .hint-chip {
+      padding: 6px 14px;
+      background: rgba(255,255,255,0.05);
+      border: 1px solid var(--border);
+      border-radius: 20px;
+      font-size: 13px;
+      color: var(--muted);
+      cursor: pointer;
+      transition: all 0.2s;
+      font-family: 'Syne', sans-serif;
+      font-weight: 600;
+    }
+    .hint-chip:hover { background: rgba(249,115,22,0.1); color: var(--orange); border-color: var(--orange); }
+
+    @media (max-width: 900px) {
+      .sidebar { display: none; }
+      .main { margin-left: 0; padding: 20px 16px; }
+      .page-header { text-align: center; }
+      .hero { padding: 40px 10px 20px; }
+      .search-box { flex-direction: column; align-items: stretch; }
+      .search-box input, .btn-cari { width: 100%; }
+      .btn-cari { margin-top: 8px; }
+      .result-container { padding: 0 10px 20px; }
+      .result-info { grid-template-columns: 1fr; }
+      .info-item { border-right: none; }
+      .timeline-section { padding: 20px 16px; }
+      .hint-section { padding: 0 10px 40px; }
+      .hint-list { justify-content: center; }
+      .hint-chip { flex: 1 1 auto; width: 100%; text-align: center; }
+    }
+  </style>
+</head>
+<body>
+
+<div class="sidebar">
+  <div class="sidebar-brand">
+    <div class="brand-icon">🚚</div>
+    <span class="brand-name">SITTA-UT</span>
+  </div>
+  <div class="nav-section">
+    <div class="nav-label">Menu</div>
+    <a class="nav-item" href="dashboard.html"><span class="icon">📊</span> Dashboard</a>
+    <a class="nav-item active" href="tracking.html"><span class="icon">📦</span> Tracking</a>
+    <a class="nav-item" href="stok.html"><span class="icon">🗃️</span> Stok Barang</a>
+    <a class="nav-item" href="histori.html"><span class="icon">📋</span> Riwayat DO</a>
+    <a class="nav-item" href="laporan.html"><span class="icon">📈</span> Laporan</a>
+  </div>
+  <div class="nav-section" style="margin-top:16px">
+    <div class="nav-label">Pengaturan</div>
+    <a class="nav-item" href="#"><span class="icon">👤</span> Profil</a>
+    <a class="nav-item" href="#"><span class="icon">⚙️</span> Pengaturan</a>
+  </div>
+  <div class="sidebar-bottom">
+    <div class="user-card">
+      <div class="user-avatar" id="userInitial">A</div>
+      <div class="user-info">
+        <div class="user-name" id="userName">Guest</div>
+        <div class="user-role">Operator</div>
+      </div>
+      <button class="logout-btn" onclick="logout()" title="Logout">⏻</button>
+    </div>
+  </div>
+</div>
+
+<main class="main">
+  <div class="page-header">
+    <h1>Tracking <span>Pengiriman</span></h1>
+    <p>Masukkan nomor DO untuk melihat status pengiriman Anda</p>
+  </div>
+  <div class="hero">
+    <div class="search-box">
+      <input type="text" id="nomorDO" placeholder="Contoh: 2023001234" onkeydown="if(event.key==='Enter') cariTracking()">
+      <button class="btn-cari" onclick="cariTracking()">Cari</button>
+    </div>
+  </div>
+  <div id="hasilTracking"></div>
+  <div class="hint-section">
+    <div class="hint-title">Coba nomor DO contoh:</div>
+    <div class="hint-list" id="hintList"></div>
+  </div>
+</main>
+
+<script src="js/data.js"></script>
+<script>
+  const nama = localStorage.getItem("namaUser");
+  if (nama) {
+    document.getElementById("userName").textContent = nama;
+    document.getElementById("userInitial").textContent = nama.charAt(0).toUpperCase();
+  }
+
+  function logout() {
+    localStorage.removeItem("namaUser");
+    window.location.href = "index.html";
+  }
+
+  // Tampilkan hint DO
+  const hintList = document.getElementById("hintList");
+  dataPengiriman.forEach(d => {
+    const chip = document.createElement("span");
+    chip.className = "hint-chip";
+    chip.textContent = d.noDO;
+    chip.onclick = () => {
+      document.getElementById("nomorDO").value = d.noDO;
+      cariTracking();
+    };
+    hintList.appendChild(chip);
+  });
+
+  function cariTracking() {
+    const noDO = document.getElementById("nomorDO").value.trim().toUpperCase();
+    const hasil = document.getElementById("hasilTracking");
+    if (!noDO) return;
+
+    const data = dataPengiriman.find(d => d.noDO.toUpperCase() === noDO);
+
+    if (!data) {
+      hasil.innerHTML = `
+        <div class="result-container">
+          <div class="not-found">
+            <div class="icon">🔍</div>
+            <h3>Nomor DO Tidak Ditemukan</h3>
+            <p>Pastikan nomor DO yang Anda masukkan sudah benar.</p>
+          </div>
+        </div>`;
+      return;
+    }
+
+    const statusClass = {
+      "Terkirim": "badge-terkirim",
+      "Sedang Dikirim": "badge-dikirim",
+      "Diproses": "badge-diproses",
+      "Ditahan": "badge-ditahan"
+    }[data.status] || "badge-diproses";
+
+    const timelineHTML = data.riwayat.map((r, i) => {
+      const isLast = i === data.riwayat.length - 1;
+      const dotClass = isLast && data.status !== "Terkirim" ? "current" : (i < data.riwayat.length - (data.status === "Terkirim" ? 0 : 1) ? "done" : "pending");
+      return `
+        <div class="tl-item">
+          <div class="tl-dot ${dotClass}"></div>
+          <div class="tl-time">${r.waktu}</div>
+          <div class="tl-desc">${r.keterangan}</div>
+          <div class="tl-loc">📍 ${r.lokasi}</div>
+        </div>`;
+    }).join("");
+
+    hasil.innerHTML = `
+      <div class="result-container">
+        <div class="result-card">
+          <div class="result-header">
+            <div>
+              <div class="do-label">Nomor DO</div>
+              <div class="do-number">${data.noDO}</div>
+            </div>
+            <span class="status-badge ${statusClass}">${data.status}</span>
+          </div>
+          <div class="result-info">
+            <div class="info-item"><div class="info-label">Pengirim</div><div class="info-value">${data.pengirim}</div></div>
+            <div class="info-item"><div class="info-label">Penerima</div><div class="info-value">${data.penerima}</div></div>
+            <div class="info-item"><div class="info-label">Asal</div><div class="info-value">${data.asal}</div></div>
+            <div class="info-item"><div class="info-label">Tujuan</div><div class="info-value">${data.tujuan}</div></div>
+            <div class="info-item"><div class="info-label">Tanggal</div><div class="info-value">${data.tanggal}</div></div>
+            <div class="info-item"><div class="info-label">Estimasi Tiba</div><div class="info-value">${data.estimasi}</div></div>
+          </div>
+          <div class="timeline-section">
+            <div class="timeline-title">Riwayat Pengiriman</div>
+            <div class="timeline">${timelineHTML}</div>
+          </div>
+        </div>
+      </div>`;
+  }
+</script>
+</body>
+</html>

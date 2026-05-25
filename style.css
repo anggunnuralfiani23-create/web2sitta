@@ -1,0 +1,140 @@
+body {
+  background: #005baa;
+  color: white;
+  border: none;
+  cursor: pointer;
+}
+
+button:hover {
+  background: #003f7f;
+}
+
+.menu-grid {
+  display: grid;
+  grid-template-columns: repeat(auto-fit, minmax(200px, 1fr));
+  gap: 20px;
+}
+
+.card {
+  background: white;
+  padding: 30px;
+  text-align: center;
+  border-radius: 10px;
+  text-decoration: none;
+  color: black;
+  box-shadow: 0 0 5px rgba(0,0,0,0.2);
+}
+
+.card:hover {
+  background: #e9f3ff;
+}
+
+table {
+  width: 100%;
+  border-collapse: collapse;
+  margin-top: 20px;
+}
+
+th, td {
+  border: 1px solid #ccc;
+  padding: 10px;
+  text-align: center;
+}
+
+.modal {
+  display: none;
+  position: fixed;
+  z-index: 1;
+  left: 0;
+  top: 0;
+  width: 100%;
+  height: 100%;
+  background: rgba(0,0,0,0.5);
+}
+
+.modal-content {
+  background: white;
+  width: min(90vw, 360px);
+  margin: 20vh auto;
+  padding: 20px;
+  border-radius: 10px;
+}
+
+.login-box {
+  width: min(420px, calc(100% - 32px));
+  margin: 60px auto;
+  background: rgba(255,255,255,0.08);
+  padding: 32px;
+  border-radius: 18px;
+  border: 1px solid rgba(255,255,255,0.12);
+  box-shadow: 0 24px 60px rgba(0,0,0,0.25);
+}
+
+.login-box h1 {
+  margin-bottom: 24px;
+  font-size: 28px;
+  letter-spacing: 0.2em;
+}
+
+.login-box input {
+  width: 100%;
+  padding: 14px 16px;
+  margin-bottom: 16px;
+  border-radius: 12px;
+  border: 1px solid rgba(255,255,255,0.2);
+  background: rgba(255,255,255,0.08);
+  color: white;
+  font-size: 15px;
+}
+
+.login-box button {
+  width: 100%;
+  padding: 14px 16px;
+  border-radius: 12px;
+  border: none;
+  background: #f97316;
+  color: white;
+  font-size: 16px;
+  font-weight: 700;
+  transition: background 0.2s;
+}
+
+.login-box button:hover {
+  background: #ea6a0a;
+}
+
+.link-box {
+  display: flex;
+  justify-content: space-between;
+  gap: 12px;
+  flex-wrap: wrap;
+  margin-top: 16px;
+}
+
+.link-box a {
+  color: #bae6fd;
+  text-decoration: none;
+  font-size: 14px;
+}
+
+@media (max-width: 600px) {
+  body {
+    padding: 12px;
+  }
+  .login-box {
+    margin: 24px auto;
+    padding: 24px 18px;
+  }
+  .login-box h1 {
+    font-size: 24px;
+  }
+  .link-box {
+    flex-direction: column;
+    align-items: stretch;
+  }
+}
+
+.close {
+  float: right;
+  cursor: pointer;
+}

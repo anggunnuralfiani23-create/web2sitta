@@ -1,0 +1,35 @@
+<!DOCTYPE html>
+<html lang="id">
+<head>
+  <meta charset="UTF-8">
+  <meta name="viewport" content="width=device-width, initial-scale=1.0">
+  <title>Login SITTA</title>
+  <link rel="stylesheet" href="css/style.css">
+</head>
+<body>
+
+<div class="login-box">
+  <h1>SITTA UT</h1>
+
+  <input type="email" id="email" placeholder="Email">
+  <input type="password" id="password" placeholder="Password">
+
+  <button onclick="login()">Login</button>
+
+  <div class="link-box">
+    <a href="#" onclick="openModal()">Lupa Password</a>
+    <a href="#" onclick="openModal()">Daftar</a>
+  </div>
+</div>
+
+<div id="myModal" class="modal">
+  <div class="modal-content">
+    <span class="close" onclick="closeModal()">&times;</span>
+    <p>Fitur belum tersedia.</p>
+  </div>
+</div>
+
+<script src="js/data.js"></script>
+<script src="js/script.js"></script>
+</body>
+</html>
